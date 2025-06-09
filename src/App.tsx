@@ -1,8 +1,10 @@
-// import React from 'react'
 import { useRef, useState } from 'react'
-import { Stage, Layer, Rect, Line, Circle, useStrictMode } from 'react-konva'
+import { Stage, Layer, Rect, Circle, useStrictMode } from 'react-konva'
 
-useStrictMode(true)
+// user-defined functions
+import gridLayer from './components/GridLayer'
+
+useStrictMode(true) // force update canvas when there is change
 
 type Base = {
   id: number
@@ -25,67 +27,27 @@ type CircleType = Base & {
   radius: number
 }
 
-type ShapeData = RectType | CircleType
+// add more shapes if needed here
 
-function App() {
+type ShapeData = RectType | CircleType // | more shape here
+
+const App = () => {
   const width = window.innerWidth
   const height = window.innerHeight
-  const blockSnapSize = 30
+  const blockSnapSize = 30 // block size
 
   document.getElementById('root')?.addEventListener('wheel', event => {
-    event.preventDefault()
+    event.preventDefault() // disable scrolling
   })
-
-  const gridLayer = () => {
-    var row = []
-    var col = []
-    const padding = blockSnapSize
-
-    for (var i = 0; i < width / padding; ++i) {
-      row.push({
-        key: `row#${i}`,
-        points: [Math.round(i * padding) + 0.5, 0, Math.round(i * padding) + 0.5, height],
-        stroke: "#ddd",
-        strokeWidth: 1,
-      })
-    }
-
-    for (var j = 0; j < height / padding; ++j) {
-      col.push({
-        key: `col#${j}`,
-        points: [0, Math.round(j * padding), width, Math.round(j * padding)],
-        stroke: "#ddd",
-        strokeWidth: 0.5,
-      })
-    }
-    return (
-      <Layer>
-        {col.map((line) => <Line
-          key={line.key}
-          points={line.points}
-          stroke={line.stroke}
-          strokeWidth={line.strokeWidth}>
-        </Line>)}
-
-        {row.map((line) => <Line
-          key={line.key}
-          points={line.points}
-          stroke={line.stroke}
-          strokeWidth={line.strokeWidth}>
-        </Line>)}
-
-      </Layer>
-    )
-  }
-
 
   const [shapes, setShapes] = useState<ShapeData[]>([
     { id: 0, type: 'rect', x: 0, y: 0, width: 30, height: 30 },
     { id: 1, type: 'circle', x: 30, y: 30, radius: 15 },
-  ])
+  ]) // manage added shapes
 
   const layerRef = useRef<any>(null)
 
+  // update shape position after dragging
   const updateShapePosition = (id: number, x: number, y: number) => {
     setShapes(prevShapes =>
       prevShapes.map(s =>
@@ -94,6 +56,7 @@ function App() {
     )
   }
 
+  // helper function
   const addRandomShape = () => {
     const id = shapes.length;
     const x = Math.random() * width;
@@ -128,7 +91,7 @@ function App() {
         </div>
         <div className="canvas" style={{ width: 64 }}>
           <Stage id='stage' ref={layerRef} width={640} height={640} draggable={true}>
-            {gridLayer()}
+            {gridLayer(blockSnapSize, width, height)}
             <Layer>
               {
                 shapes.map((shape) => {
