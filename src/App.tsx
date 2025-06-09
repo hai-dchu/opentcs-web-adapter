@@ -3,33 +3,10 @@ import { Stage, Layer, Rect, Circle, useStrictMode } from 'react-konva'
 
 // user-defined functions
 import gridLayer from './components/GridLayer'
+import type { ShapeData } from './types'
+import addRandomShape from './utils/AddRandomShape'
 
 useStrictMode(true) // force update canvas when there is change
-
-type Base = {
-  id: number
-  x: number
-  y: number
-  fill?: string
-  stroke?: string
-  strokeWidth?: number
-  draggable?: boolean
-}
-
-type RectType = Base & {
-  type: 'rect'
-  width: number
-  height: number
-}
-
-type CircleType = Base & {
-  type: 'circle'
-  radius: number
-}
-
-// add more shapes if needed here
-
-type ShapeData = RectType | CircleType // | more shape here
 
 const App = () => {
   const width = window.innerWidth
@@ -56,37 +33,13 @@ const App = () => {
     )
   }
 
-  // helper function
-  const addRandomShape = () => {
-    const id = shapes.length;
-    const x = Math.random() * width;
-    const y = Math.random() * height;
-    const newShape: ShapeData = Math.random() > 0.5
-      ? {
-        id,
-        type: 'rect',
-        x: Math.round(x / blockSnapSize) * blockSnapSize,
-        y: Math.round(y / blockSnapSize) * blockSnapSize,
-        width: 30,
-        height: 30
-      }
-      : {
-        id,
-        type: 'circle',
-        x: Math.round(x / blockSnapSize) * blockSnapSize,
-        y: Math.round(y / blockSnapSize) * blockSnapSize,
-        radius: 15
-      };
-    setShapes(prevShapes => [...prevShapes, newShape]);
-  }
-
   return (
     <>
       <div style={{ display: 'flex', flexDirection: 'row' }}>
         <div style={{ display: 'flex', flexDirection: 'column' }}>
           <h1>Hello World</h1>
           <p>Hello World</p>
-          <button onClick={addRandomShape}>Add Shape</button>
+          <button onClick={() => addRandomShape(shapes, setShapes, blockSnapSize, width, height)}>Add Shape</button>
           <button onClick={() => setShapes([])}>Clear Shape</button>
         </div>
         <div className="canvas" style={{ width: 64 }}>
