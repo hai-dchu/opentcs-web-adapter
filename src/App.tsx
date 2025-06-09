@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { Stage, Layer, Rect, Circle, useStrictMode } from 'react-konva'
 
 // user-defined functions
@@ -17,83 +17,123 @@ const App = () => {
     event.preventDefault() // disable scrolling
   })
 
-  const [shapes, setShapes] = useState<ShapeData[]>([
-    { id: 0, type: 'rect', x: 0, y: 0, width: 30, height: 30 },
-    { id: 1, type: 'circle', x: 30, y: 30, radius: 15 },
-  ]) // manage added shapes
+  const [shapes, setShapes] = useState<ShapeData[]>([]) // manage added shapes
+
+  const history = useRef<ShapeData[][]>([shapes])
+  const lastHistoryIndex = useRef(0)
+  const resetFlag = useRef(true)
+
+  useEffect(() => {
+    console.log(shapes)
+    if (resetFlag.current) {
+      // Record new state
+      history.current.push(shapes);
+      lastHistoryIndex.current += 1
+    }
+    resetFlag.current = true
+  }, [shapes])
+
+  const handleKeydown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if ((event.ctrlKey || event.metaKey) && event.shiftKey && event.key.toLowerCase() === 'z') {
+      event.preventDefault()
+      console.log('ctrl+z pressed')
+      handleUndo()
+    } else if ((event.ctrlKey || event.metaKey) && event.shiftKey && event.key.toLowerCase() === 'y') {
+      event.preventDefault()
+      console.log('ctrl+y pressed')
+      handleRedo()
+    }
+  }
+
+  const handleUndo = () => {
+    if (lastHistoryIndex.current <= 0) return
+
+    const previous = history.current[lastHistoryIndex.current - 1]
+    lastHistoryIndex.current -= 1
+    resetFlag.current = false
+    setShapes(previous)
+  }
+
+  const handleRedo = () => {
+    if (lastHistoryIndex.current >= history.current.length - 1) return
+
+    const next = history.current[lastHistoryIndex.current + 1]
+    lastHistoryIndex.current += 1
+    resetFlag.current = false
+    setShapes(next)
+  }
 
   const layerRef = useRef<any>(null)
 
   // update shape position after dragging
-  const updateShapePosition = (id: number, x: number, y: number) => {
-    setShapes(prevShapes =>
-      prevShapes.map(s =>
-        s.id === id ? { ...s, x, y } : s
-      )
+  const handleDragEnd = (id: number, x: number, y: number) => {
+    const newShapes = shapes.map(s =>
+      s.id === id ? { ...s, x, y } : s
     )
+    setShapes(newShapes)
   }
 
   return (
-    <>
-      <div style={{ display: 'flex', flexDirection: 'row' }}>
-        <div style={{ display: 'flex', flexDirection: 'column' }}>
-          <h1>Hello World</h1>
-          <p>Hello World</p>
-          <button onClick={() => addRandomShape(shapes, setShapes, blockSnapSize, width, height)}>Add Shape</button>
-          <button onClick={() => setShapes([])}>Clear Shape</button>
-        </div>
-        <div className="canvas" style={{ width: 64 }}>
-          <Stage id='stage' ref={layerRef} width={640} height={640} draggable={true}>
-            {gridLayer(blockSnapSize, width, height)}
-            <Layer>
-              {
-                shapes.map((shape) => {
-                  switch (shape.type) {
-                    case 'rect':
-                      return (
-                        <Rect
-                          key={shape.id}
-                          x={shape.x + blockSnapSize / 2}
-                          y={shape.y + blockSnapSize / 2}
-                          width={shape.width}
-                          height={shape.height}
-                          fill={shape.fill || '#000'}
-                          stroke={shape.stroke || '#ddd'}
-                          strokeWidth={shape.strokeWidth || 2}
-                          draggable={shape.draggable || true}
-                          onDragEnd={(e) => updateShapePosition(shape.id,
-                            Math.round(e.target.x() / blockSnapSize) * blockSnapSize,
-                            Math.round(e.target.y() / blockSnapSize) * blockSnapSize
-                          )}
-                        />
-                      )
-                    case 'circle':
-                      return (
-                        <Circle
-                          key={shape.id}
-                          x={shape.x}
-                          y={shape.y}
-                          radius={shape.radius}
-                          fill={shape.fill || '#000'}
-                          stroke={shape.stroke || '#ddd'}
-                          strokeWidth={shape.strokeWidth || 2}
-                          draggable={shape.draggable || true}
-                          onDragEnd={(e) => updateShapePosition(shape.id,
-                            Math.round(e.target.x() / blockSnapSize) * blockSnapSize,
-                            Math.round(e.target.y() / blockSnapSize) * blockSnapSize
-                          )}
-                        />
-                      )
-                    default:
-                      return null
-                  }
-                })
-              }
-            </Layer>
-          </Stage>
-        </div>
+    <div style={{ display: 'flex', flexDirection: 'row' }} onKeyDown={handleKeydown} tabIndex={0}>
+      <div style={{ display: 'flex', flexDirection: 'column' }}>
+        <h1>Hello World</h1>
+        <p>Hello World</p>
+        <button onClick={() => addRandomShape(shapes, setShapes, blockSnapSize, 640, 640)}>Add Shape</button>
+        <button onClick={() => setShapes([])}>Clear Shape</button>
+        <button onClick={() => handleUndo()}>Undo</button>
+        <button onClick={() => handleRedo()}>Redo</button>
       </div>
-    </>
+      <div className="canvas" style={{ width: 64 }}>
+        <Stage id='stage' ref={layerRef} width={640} height={640} draggable={true}>
+          {gridLayer(blockSnapSize, width, height)}
+          <Layer>
+            {
+              shapes.map((shape) => {
+                switch (shape.type) {
+                  case 'rect':
+                    return (
+                      <Rect
+                        key={shape.id}
+                        x={shape.x + blockSnapSize / 2}
+                        y={shape.y + blockSnapSize / 2}
+                        width={shape.width}
+                        height={shape.height}
+                        fill={shape.fill || '#000'}
+                        stroke={shape.stroke || '#ddd'}
+                        strokeWidth={shape.strokeWidth || 2}
+                        draggable={shape.draggable || true}
+                        onDragEnd={(e) => handleDragEnd(shape.id,
+                          Math.round(e.target.x() / blockSnapSize) * blockSnapSize,
+                          Math.round(e.target.y() / blockSnapSize) * blockSnapSize
+                        )}
+                      />
+                    )
+                  case 'circle':
+                    return (
+                      <Circle
+                        key={shape.id}
+                        x={shape.x}
+                        y={shape.y}
+                        radius={shape.radius}
+                        fill={shape.fill || '#000'}
+                        stroke={shape.stroke || '#ddd'}
+                        strokeWidth={shape.strokeWidth || 2}
+                        draggable={shape.draggable || true}
+                        onDragEnd={(e) => handleDragEnd(shape.id,
+                          Math.round(e.target.x() / blockSnapSize) * blockSnapSize,
+                          Math.round(e.target.y() / blockSnapSize) * blockSnapSize
+                        )}
+                      />
+                    )
+                  default:
+                    return null
+                }
+              })
+            }
+          </Layer>
+        </Stage>
+      </div>
+    </div>
   )
 }
 
