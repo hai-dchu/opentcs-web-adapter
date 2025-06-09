@@ -17,8 +17,8 @@ const App = () => {
     event.preventDefault() // disable scrolling
   })
 
+  // Manage shapes
   const [shapes, setShapes] = useState<ShapeData[]>([]) // manage added shapes
-
   const history = useRef<ShapeData[][]>([shapes])
   const lastHistoryIndex = useRef(0)
   const resetFlag = useRef(true)
@@ -33,6 +33,8 @@ const App = () => {
     resetFlag.current = true
   }, [shapes])
 
+
+  // Handle Ctrl+Shift+Z, Ctrl+Shift+Y and possible other keybinds in the future
   const handleKeydown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if ((event.ctrlKey || event.metaKey) && event.shiftKey && event.key.toLowerCase() === 'z') {
       event.preventDefault()
@@ -63,8 +65,7 @@ const App = () => {
     setShapes(next)
   }
 
-  const layerRef = useRef<any>(null)
-
+  // Handle snapping (aline shape into grid)
   // update shape position after dragging
   const handleDragEnd = (id: number, x: number, y: number) => {
     const newShapes = shapes.map(s =>
@@ -73,19 +74,30 @@ const App = () => {
     setShapes(newShapes)
   }
 
+  // Handle "infinite" canvas
+  const [stagePos, setStagePos] = useState({ x: 0, y: 0 });
+
   return (
     <div style={{ display: 'flex', flexDirection: 'row' }} onKeyDown={handleKeydown} tabIndex={0}>
       <div style={{ display: 'flex', flexDirection: 'column' }}>
         <h1>Hello World</h1>
         <p>Hello World</p>
-        <button onClick={() => addRandomShape(shapes, setShapes, blockSnapSize, 640, 640)}>Add Shape</button>
+        <button onClick={() => addRandomShape(shapes, setShapes, blockSnapSize, width, height)}>Add Shape</button>
         <button onClick={() => setShapes([])}>Clear Shape</button>
         <button onClick={() => handleUndo()}>Undo</button>
         <button onClick={() => handleRedo()}>Redo</button>
       </div>
-      <div className="canvas" style={{ width: 64 }}>
-        <Stage id='stage' ref={layerRef} width={640} height={640} draggable={true}>
-          {gridLayer(blockSnapSize, width, height)}
+      <div className="canvas">
+        <Stage
+          id='stage'
+          width={width}
+          height={height}
+          draggable={true}
+          onDragEnd={(e) => {
+            console.log(e.currentTarget.position())
+            setStagePos(e.currentTarget.position())
+          }}>
+          {gridLayer(blockSnapSize, width, height, stagePos)}
           <Layer>
             {
               shapes.map((shape) => {

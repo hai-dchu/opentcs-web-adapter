@@ -4,44 +4,41 @@ import { Layer, Line } from "react-konva"
 // width: div width
 // height: div height
 // blockSnapSize: block dimension
-const gridLayer = (blockSnapSize: number, width: number, height: number) => {
-    var row = []
-    var col = []
-    const padding = blockSnapSize
+const gridLayer = (blockSnapSize: number, width: number, height: number, stagePos: { x: number, y: number }) => {
+    const grid = []
 
-    for (var i = 0; i < width / padding; ++i) {
-        row.push({
-            key: `row#${i}`,
-            points: [Math.round(i * padding) + 0.5, 0, Math.round(i * padding) + 0.5, height],
+    const padding = blockSnapSize
+    const startX = Math.floor(-stagePos.x / padding) * padding
+    const endX = Math.floor((-stagePos.x + width) / padding) * padding
+
+    const startY = Math.floor(-stagePos.y / padding) * padding
+    const endY = Math.floor((-stagePos.y + height) / padding) * padding
+
+    for (let x = startX; x <= endX; x += padding) {
+        grid.push({
+            key: `v#${x}`,
+            points: [x + 0.5, startY, x + 0.5, endY],
             stroke: "#ddd",
-            strokeWidth: 1,
+            strokeWidth: x === 0 ? 5 : 1,
         })
     }
 
-    for (var j = 0; j < height / padding; ++j) {
-        col.push({
-            key: `col#${j}`,
-            points: [0, Math.round(j * padding), width, Math.round(j * padding)],
+    for (let y = startY; y <= endY; y += padding) {
+        grid.push({
+            key: `h#${y}`,
+            points: [startX, y + 0.5, endX, y + 0.5],
             stroke: "#ddd",
-            strokeWidth: 0.5,
+            strokeWidth: y === 0 ? 5 : 1,
         })
     }
     return (
         <Layer>
-            {col.map((line) => <Line
+            {grid.map((line) => <Line
                 key={line.key}
                 points={line.points}
                 stroke={line.stroke}
                 strokeWidth={line.strokeWidth}>
             </Line>)}
-
-            {row.map((line) => <Line
-                key={line.key}
-                points={line.points}
-                stroke={line.stroke}
-                strokeWidth={line.strokeWidth}>
-            </Line>)}
-
         </Layer>
     )
 }
