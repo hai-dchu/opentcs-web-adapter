@@ -4,7 +4,14 @@ import { Layer, Line } from "react-konva"
 // width: div width
 // height: div height
 // blockSnapSize: block dimension
-const gridLayer = (blockSnapSize: number, width: number, height: number, stagePos: { x: number, y: number }) => {
+const gridLayer = (
+    blockSnapSize: number,
+    width: number,
+    height: number,
+    stagePos: {
+        x: number,
+        y: number
+    }) => {
     const grid = []
 
     const padding = blockSnapSize
@@ -19,7 +26,7 @@ const gridLayer = (blockSnapSize: number, width: number, height: number, stagePo
             key: `v#${x}`,
             points: [x + 0.5, startY, x + 0.5, endY],
             stroke: "#ddd",
-            strokeWidth: x === 0 ? 5 : 1,
+            strokeWidth: 1,
         })
     }
 
@@ -28,7 +35,7 @@ const gridLayer = (blockSnapSize: number, width: number, height: number, stagePo
             key: `h#${y}`,
             points: [startX, y + 0.5, endX, y + 0.5],
             stroke: "#ddd",
-            strokeWidth: y === 0 ? 5 : 1,
+            strokeWidth: 1,
         })
     }
     return (
