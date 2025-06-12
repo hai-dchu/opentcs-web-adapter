@@ -15,11 +15,11 @@ const gridLayer = (
     const grid = []
 
     const padding = blockSnapSize
-    const startX = Math.floor(-stagePos.x / padding) * padding
-    const endX = Math.floor((-stagePos.x + width) / padding) * padding
+    const startX = Math.floor(-(stagePos.x + 2 * width) / padding) * padding
+    const endX = Math.floor((-stagePos.x + 2 * width) / padding) * padding
 
-    const startY = Math.floor(-stagePos.y / padding) * padding
-    const endY = Math.floor((-stagePos.y + height) / padding) * padding
+    const startY = Math.floor(-(stagePos.y + 2 * height) / padding) * padding
+    const endY = Math.floor((-stagePos.y + 2 * height) / padding) * padding
 
     for (let x = startX; x <= endX; x += padding) {
         grid.push({

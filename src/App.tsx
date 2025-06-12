@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { Stage, Layer, Rect, Circle, useStrictMode } from 'react-konva'
+import { Stage, useStrictMode } from 'react-konva'
 
 // user-defined functions
 import gridLayer from './components/GridLayer'
@@ -7,9 +7,9 @@ import type { ShapeData, ConnectorData } from './types'
 import addRandomShape from './utils/AddRandomShape'
 import connectRandomShapes from './utils/ConnectRandomShape'
 import connectorLayer from './components/ConnectorLayer'
+import shapeLayer from './components/ShapeLayer'
 
 useStrictMode(true) // force update canvas when there is change
-
 
 const App = () => {
   const width = window.innerWidth
@@ -64,14 +64,8 @@ const App = () => {
     setShapes(next)
   }
 
-  // Handle snapping (aline shape into grid)
+  // Handle snapping (align shape into grid)
   // update shape position after dragging
-  const handleDragEnd = (id: number, x: number, y: number) => {
-    const newShapes = shapes.map(s => s.id === id ? { ...s, x, y } : s
-
-    )
-    setShapes(newShapes)
-  }
 
   // Handle "infinite" canvas
   const [stagePos, setStagePos] = useState({ x: 0, y: 0 });
@@ -108,51 +102,7 @@ const App = () => {
           }}>
           {gridLayer(blockSnapSize, width, height, stagePos)}
           {connectorLayer(connectors, shapes, blockSnapSize)}
-          <Layer>
-            {
-              shapes.map((shape) => {
-                switch (shape.type) {
-                  case 'rect':
-                    return (
-                      <Rect
-                        key={shape.id}
-                        x={shape.x + blockSnapSize / 2}
-                        y={shape.y + blockSnapSize / 2}
-                        width={shape.width}
-                        height={shape.height}
-                        fill={shape.fill || '#000'}
-                        stroke={shape.stroke || '#ddd'}
-                        strokeWidth={shape.strokeWidth || 2}
-                        draggable={shape.draggable || true}
-                        onDragEnd={(e) => handleDragEnd(shape.id,
-                          Math.round(e.target.x() / blockSnapSize) * blockSnapSize,
-                          Math.round(e.target.y() / blockSnapSize) * blockSnapSize
-                        )}
-                      />
-                    )
-                  case 'circle':
-                    return (
-                      <Circle
-                        key={shape.id}
-                        x={shape.x}
-                        y={shape.y}
-                        radius={shape.radius}
-                        fill={shape.fill || '#000'}
-                        stroke={shape.stroke || '#ddd'}
-                        strokeWidth={shape.strokeWidth || 2}
-                        draggable={shape.draggable || true}
-                        onDragEnd={(e) => handleDragEnd(shape.id,
-                          Math.round(e.target.x() / blockSnapSize) * blockSnapSize,
-                          Math.round(e.target.y() / blockSnapSize) * blockSnapSize
-                        )}
-                      />
-                    )
-                  default:
-                    return null
-                }
-              })
-            }
-          </Layer>
+          {shapeLayer(shapes, setShapes, blockSnapSize)}
         </Stage>
       </div>
     </div>
