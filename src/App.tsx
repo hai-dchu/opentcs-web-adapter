@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { Stage, useStrictMode } from 'react-konva'
+import { Layer, Line, Stage, useStrictMode } from 'react-konva'
 
 // user-defined functions
 import gridLayer from './components/GridLayer'
@@ -88,21 +88,22 @@ const App = () => {
           setShapes([])
           setConnectors([])
         }}>Clear Shape</button>
-        {/* <button onClick={back}>Back</button> */}
       </div>
       <div className="canvas" style={{ display: 'flex' }} ref={canvasRef}>
         <Stage
           id='stage'
-          width={width}
+          width={800}
           height={height}
           draggable={true}
           ref={canvasRef}
           onDragEnd={(e) => {
             setStagePos(e.currentTarget.position())
           }}>
-          {gridLayer(blockSnapSize, width, height, stagePos)}
-          {connectorLayer(connectors, shapes, blockSnapSize)}
-          {shapeLayer(shapes, setShapes, blockSnapSize)}
+          <Layer>
+            {gridLayer(blockSnapSize, width, height, stagePos)}
+            {connectorLayer(connectors, shapes, blockSnapSize)}
+            {shapeLayer(shapes, setShapes, blockSnapSize)}
+          </Layer>
         </Stage>
       </div>
     </div>

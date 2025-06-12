@@ -1,4 +1,4 @@
-import { Arrow, Layer } from "react-konva";
+import { Arrow, Group } from "react-konva";
 import type { ConnectorData, ShapeData } from "../types";
 
 import generateConnectors from "../utils/GenerateConnector";
@@ -9,7 +9,7 @@ const connectorLayer = (
     blockSnapSize: number
 ) => {
     return (
-        <Layer>
+        <Group>
             {connectors.map((connector) => {
                 const fromShape = shapes.find((t) => t.id === connector.from)
                 const toShape = shapes.find((t) => t.id === connector.to)
@@ -25,7 +25,7 @@ const connectorLayer = (
                         stroke={connector.stroke} />
                 )
             })}
-        </Layer>
+        </Group>
     )
 }
 

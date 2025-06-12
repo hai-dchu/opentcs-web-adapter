@@ -1,4 +1,4 @@
-import { Layer, Line } from "react-konva"
+import { Group, Line } from "react-konva"
 
 // draw grid layer
 // width: div width
@@ -39,14 +39,14 @@ const gridLayer = (
         })
     }
     return (
-        <Layer>
+        <Group>
             {grid.map((line) => <Line
                 key={line.key}
                 points={line.points}
                 stroke={line.stroke}
                 strokeWidth={line.strokeWidth}>
             </Line>)}
-        </Layer>
+        </Group>
     )
 }
 

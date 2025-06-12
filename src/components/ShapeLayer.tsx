@@ -1,4 +1,4 @@
-import { Circle, Layer, Rect } from "react-konva";
+import { Circle, Group, Rect } from "react-konva";
 import type { ShapeData } from "../types";
 
 const shapeLayer = (
@@ -13,7 +13,7 @@ const shapeLayer = (
         setShapes(newShapes)
     }
     return (
-        <Layer>
+        <Group>
             {
                 shapes.map((shape) => {
                     switch (shape.type) {
@@ -57,7 +57,7 @@ const shapeLayer = (
                     }
                 })
             }
-        </Layer>
+        </Group>
     )
 }
 
