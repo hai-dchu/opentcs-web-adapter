@@ -11,7 +11,9 @@ const gridLayer = (
     stagePos: {
         x: number,
         y: number
-    }) => {
+    },
+    scale: number
+) => {
     const grid = []
 
     const padding = blockSnapSize
@@ -44,7 +46,7 @@ const gridLayer = (
                 key={line.key}
                 points={line.points}
                 stroke={line.stroke}
-                strokeWidth={line.strokeWidth}>
+                strokeWidth={line.strokeWidth / scale}>
             </Line>)}
         </Group>
     )

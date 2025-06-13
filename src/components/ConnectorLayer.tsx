@@ -6,7 +6,8 @@ import generateConnectors from "../utils/GenerateConnector";
 const connectorLayer = (
     connectors: ConnectorData[],
     shapes: ShapeData[],
-    blockSnapSize: number
+    blockSnapSize: number,
+    scale: number
 ) => {
     return (
         <Group>
@@ -14,7 +15,7 @@ const connectorLayer = (
                 const fromShape = shapes.find((t) => t.id === connector.from)
                 const toShape = shapes.find((t) => t.id === connector.to)
                 if (!fromShape || !toShape) return null
-                const points = generateConnectors(fromShape, toShape, blockSnapSize)
+                const points = generateConnectors(fromShape, toShape, scale)
 
                 return (
                     <Arrow
@@ -22,7 +23,8 @@ const connectorLayer = (
                         key={connector.id}
                         points={points}
                         fill={connector.fill}
-                        stroke={connector.stroke} />
+                        stroke={connector.stroke}
+                        strokeWidth={connector.strokeWidth} />
                 )
             })}
         </Group>

@@ -16,21 +16,23 @@ const addRandomShape = (
     const id = shapes.length;
     const x = Math.random() * width;
     const y = Math.random() * height;
-    const newShape: ShapeData = Math.random() > 0.5
+    const newShape: ShapeData = 0.3 > 0.5
         ? {
             id,
             type: 'rect',
             x: Math.round(x / blockSnapSize) * blockSnapSize,
             y: Math.round(y / blockSnapSize) * blockSnapSize,
-            width: 30,
-            height: 30
+            strokeWidth: 1,
+            width: 12,
+            height: 12
         }
         : {
             id,
             type: 'circle',
             x: Math.round(x / blockSnapSize) * blockSnapSize,
             y: Math.round(y / blockSnapSize) * blockSnapSize,
-            radius: 15
+            strokeWidth: 1,
+            radius: 6
         };
     setShapes((prevShapes: any) => [...prevShapes, newShape]);
 }

@@ -3,7 +3,7 @@ import type { ShapeData } from "../types";
 const generateConnectors = (
     from: ShapeData,
     to: ShapeData,
-    blockSnapSize: number
+    scale: number
 ) => {
     const dx = to.x - from.x;
     const dy = to.y - from.y;
@@ -14,17 +14,19 @@ const generateConnectors = (
     let fromShift = 0
     let toShift = 0
     if (from.type === 'rect') {
-        fromRadius += Math.sqrt(from.width * from.width + from.height * from.height) / 2 + 5
-        fromShift += blockSnapSize
+        fromRadius += Math.sqrt(from.width * from.width + from.height * from.height) / 2
+        fromShift += from.width / 2
     } else {
-        fromRadius += from.radius + 5
+        fromRadius += from.radius
+        fromShift += 0
     }
 
     if (to.type === 'rect') {
-        toRadius += Math.sqrt(to.width * to.width + to.height * to.height) / 2 + 5
-        toShift += blockSnapSize
+        toRadius += Math.sqrt(to.width * to.width + to.height * to.height) / 2
+        toShift += to.width / 2
     } else {
-        toRadius += to.radius + 5
+        toRadius += to.radius
+        fromShift += 0
     }
 
     return [

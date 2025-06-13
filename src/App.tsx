@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { Layer, Line, Stage, useStrictMode } from 'react-konva'
+import { Layer, Stage, useStrictMode } from 'react-konva'
 
 // user-defined functions
 import gridLayer from './components/GridLayer'
@@ -12,10 +12,6 @@ import shapeLayer from './components/ShapeLayer'
 useStrictMode(true) // force update canvas when there is change
 
 const App = () => {
-  const width = window.innerWidth
-  const height = window.innerHeight
-  const blockSnapSize = 30 // block size
-
   // document.getElementById('root')?.addEventListener('wheel', event => {
   //   event.preventDefault() // disable scrolling
   // })
@@ -75,14 +71,61 @@ const App = () => {
 
   const canvasRef = useRef<any>(null)
 
+  // handle connectors
   const [connectors, setConnectors] = useState<ConnectorData[]>([])
+
+  const stageRef = useRef<any>(null)
+  const [scale, setScale] = useState(1)
+  const [blockSnapSize, setBlockSnapSize] = useState(30) // block size
+
+  const handleWheel = (e: any) => {
+    e.evt.preventDefault();
+
+    const stage = stageRef.current;
+    const oldScale = stage.scaleX();
+    const pointer = stage.getPointerPosition();
+
+    const mousePointTo = {
+      x: (pointer.x - stage.x()) / oldScale,
+      y: (pointer.y - stage.y()) / oldScale,
+    };
+
+    // how to scale? Zoom in? Or zoom out?
+    let direction = e.evt.deltaY > 0 ? 1 : -1;
+
+    // when we zoom on trackpad, e.evt.ctrlKey is true
+    // in that case lets revert direction
+    if (e.evt.ctrlKey) {
+      direction = -direction;
+    }
+
+    const scaleBy = 1.01;
+    let newScale = direction > 0 ? oldScale * scaleBy : oldScale / scaleBy;
+    if (newScale < 0.5) newScale = 0.5; // minimum scale
+    if (newScale > 4) newScale = 4; // maximum scale
+    // console.log(newScale);
+    const scales = [0.5, 1, 2, 4]
+    const index = scales.reduce((prev, curr) => {
+      return Math.abs(curr - newScale) < Math.abs(prev - newScale) ? curr : prev
+    }, 1)
+    setBlockSnapSize(30 / index) // update block size based on scale
+    setScale(newScale)
+
+    stage.scale({ x: newScale, y: newScale })
+
+    const newPos = {
+      x: pointer.x - mousePointTo.x * newScale,
+      y: pointer.y - mousePointTo.y * newScale,
+    };
+    stage.position(newPos)
+  }
 
   return (
     <div style={{ display: 'flex', flexDirection: 'row' }} onKeyDown={handleKeydown} tabIndex={0}>
       <div style={{ display: 'flex', flexDirection: 'column', padding: '0px 10px' }}>
         <h1>Hello World</h1>
         <p>Hello World</p>
-        <button onClick={() => addRandomShape(shapes, setShapes, blockSnapSize, width, height)}>Add Shape</button>
+        <button onClick={() => addRandomShape(shapes, setShapes, blockSnapSize, 800, window.innerHeight)}>Add Shape</button>
         <button onClick={() => connectRandomShapes(shapes, setConnectors)}>Add connectors</button>
         <button onClick={() => {
           setShapes([])
@@ -93,16 +136,18 @@ const App = () => {
         <Stage
           id='stage'
           width={800}
-          height={height}
+          height={window.innerHeight}
           draggable={true}
-          ref={canvasRef}
+          ref={stageRef}
+          // onDragMove={(e) => {}}
           onDragEnd={(e) => {
             setStagePos(e.currentTarget.position())
-          }}>
+          }}
+          onWheel={handleWheel}>
           <Layer>
-            {gridLayer(blockSnapSize, width, height, stagePos)}
-            {connectorLayer(connectors, shapes, blockSnapSize)}
-            {shapeLayer(shapes, setShapes, blockSnapSize)}
+            {gridLayer(blockSnapSize, 800, window.innerHeight, stagePos, scale)}
+            {connectorLayer(connectors, shapes, blockSnapSize, scale)}
+            {shapeLayer(shapes, setShapes, 7.5, scale)}
           </Layer>
         </Stage>
       </div>

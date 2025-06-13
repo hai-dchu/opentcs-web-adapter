@@ -4,7 +4,8 @@ import type { ShapeData } from "../types";
 const shapeLayer = (
     shapes: ShapeData[],
     setShapes: React.Dispatch<React.SetStateAction<ShapeData[]>>,
-    blockSnapSize: number
+    blockSnapSize: number,
+    scale: number
 ) => {
     const handleDragEnd = (id: number, x: number, y: number) => {
         const newShapes = shapes.map(s => s.id === id ? { ...s, x, y } : s
@@ -21,8 +22,8 @@ const shapeLayer = (
                             return (
                                 <Rect
                                     key={shape.id}
-                                    x={shape.x + blockSnapSize / 2}
-                                    y={shape.y + blockSnapSize / 2}
+                                    x={shape.x - shape.width / 2}
+                                    y={shape.y - shape.height / 2}
                                     width={shape.width}
                                     height={shape.height}
                                     fill={shape.fill || '#000'}
