@@ -47,6 +47,9 @@ const shapeLayer = (
                                     stroke={shape.stroke || '#ddd'}
                                     strokeWidth={shape.strokeWidth || 2}
                                     draggable={shape.draggable || true}
+                                        // onDragMove={(e) => {
+                                        //     handleDragEnd(shape.id, e.target.x(), e.target.y())
+                                        // }}
                                     onDragEnd={(e) => handleDragEnd(shape.id,
                                         Math.round(e.target.x() / blockSnapSize) * blockSnapSize,
                                         Math.round(e.target.y() / blockSnapSize) * blockSnapSize

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { Layer, Stage, useStrictMode } from 'react-konva'
+import { Group, Layer, Rect, Stage, useStrictMode } from 'react-konva'
 
 // user-defined functions
 import gridLayer from './components/GridLayer'
@@ -99,11 +99,10 @@ const App = () => {
       direction = -direction;
     }
 
-    const scaleBy = 1.01;
+    const scaleBy = 1.01
     let newScale = direction > 0 ? oldScale * scaleBy : oldScale / scaleBy;
     if (newScale < 0.5) newScale = 0.5; // minimum scale
     if (newScale > 4) newScale = 4; // maximum scale
-    // console.log(newScale);
     const scales = [0.5, 1, 2, 4]
     const index = scales.reduce((prev, curr) => {
       return Math.abs(curr - newScale) < Math.abs(prev - newScale) ? curr : prev
@@ -120,17 +119,80 @@ const App = () => {
     stage.position(newPos)
   }
 
+  const rulerRefX = useRef<any>(null)
+  const rulerRefY = useRef<any>(null)
+  const groupRef = useRef<any>(null)
+  const ruler = (fill: string) => {
+    const ticks = []
+    const rulerX = rulerRefX.current
+    const rulerY = rulerRefY.current
+    // if (!rulerX || !rulerY) return    
+
+    for (let i = 0; i < 800; i += blockSnapSize * scale) {
+      ticks.push(
+        <Rect
+          key={`x-${i}`}
+          x={i + stagePos.x}
+          y={0}
+          width={1}
+          height={10}
+          fill={'black'}
+        />
+      )
+    }
+    for (let i = 0; i < window.innerHeight; i += blockSnapSize * scale) {
+      ticks.push(
+        <Rect
+          key={`y-${i}`}
+          x={0}
+          y={i + stagePos.y}
+          width={10}
+          height={1}
+          fill={'black'}
+        />
+      )
+    }
+
+    return (
+      <Group ref={groupRef}>
+        <Group ref={rulerRefX}>
+          <Rect
+            width={800}
+            height={20}
+            stroke={fill}
+            fill={fill} />
+          {ticks}
+        </Group>
+
+        <Group ref={rulerRefY}>
+          <Rect
+            width={20}
+            height={window.innerHeight}
+            stroke={fill}
+            fill={fill} />
+          {ticks}
+        </Group>
+      </Group>
+    )
+  }
+
+  const [isAddShape, setIsAddShape] = useState(false)
+  const handleAddShape = () => {
+    setIsAddShape(!isAddShape)
+  }
+
   return (
     <div style={{ display: 'flex', flexDirection: 'row' }} onKeyDown={handleKeydown} tabIndex={0}>
-      <div style={{ display: 'flex', flexDirection: 'column', padding: '0px 10px' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', padding: '0px 20px', gap: '10px' }}>
         <h1>Hello World</h1>
         <p>Hello World</p>
-        <button onClick={() => addRandomShape(shapes, setShapes, blockSnapSize, 800, window.innerHeight)}>Add Shape</button>
+        {/* <button onClick={() => addRandomShape(shapes, setShapes, blockSnapSize, 800, window.innerHeight)}>Add Random Shape</button> */}
         <button onClick={() => connectRandomShapes(shapes, setConnectors)}>Add connectors</button>
         <button onClick={() => {
           setShapes([])
           setConnectors([])
         }}>Clear Shape</button>
+        <button onClick={handleAddShape}>Add Shape</button>
       </div>
       <div className="canvas" style={{ display: 'flex' }} ref={canvasRef}>
         <Stage
@@ -139,15 +201,74 @@ const App = () => {
           height={window.innerHeight}
           draggable={true}
           ref={stageRef}
-          // onDragMove={(e) => {}}
+          onDragMove={(e) => {
+            const group = groupRef.current
+            if (group) {
+              group.position({
+                x: -e.currentTarget.x() / e.currentTarget.scaleX(),
+                y: -e.currentTarget.y() / e.currentTarget.scaleY(),
+              })
+              group.scale({
+                x: 1 / e.currentTarget.scaleX(),
+                y: 1 / e.currentTarget.scaleY(),
+              })
+            }
+            const rulerX = rulerRefX.current
+            const rulerY = rulerRefY.current
+          }}
           onDragEnd={(e) => {
             setStagePos(e.currentTarget.position())
+            const group = groupRef.current
+            if (group) {
+              group.position({
+                x: -e.currentTarget.x() / e.currentTarget.scaleX(),
+                y: -e.currentTarget.y() / e.currentTarget.scaleY(),
+              })
+              group.scale({
+                x: 1 / e.currentTarget.scaleX(),
+                y: 1 / e.currentTarget.scaleY(),
+              })
+            }
           }}
-          onWheel={handleWheel}>
+          onClick={(e) => {
+            if (isAddShape) {
+              setShapes((prevShapes: any) => [...prevShapes, {
+                id: shapes.length,
+                type: 'circle',
+                x: Math.round((e.evt.x - 210 - e.currentTarget.x()) / e.currentTarget.scaleX() / blockSnapSize) * blockSnapSize,
+                y: Math.round((e.evt.y - e.currentTarget.y()) / e.currentTarget.scaleY() / blockSnapSize) * blockSnapSize,
+                strokeWidth: 1,
+                radius: 6
+              }])
+              // console.log(shapes);
+              // console.log({
+              //   x: Math.round((e.evt.x - 210 - e.currentTarget.x()) / e.currentTarget.scaleX() / blockSnapSize) * blockSnapSize,
+              //   y: Math.round((e.evt.y - e.currentTarget.y()) / e.currentTarget.scaleY() / blockSnapSize) * blockSnapSize
+              // });
+            }
+          }}
+          onWheel={(e) => {
+            // setStagePos(e.currentTarget.position())
+            handleWheel(e)
+            const group = groupRef.current
+            if (group) {
+              group.position({
+                x: -e.currentTarget.x() / e.currentTarget.scaleX(),
+                y: -e.currentTarget.y() / e.currentTarget.scaleY(),
+              })
+              group.scale({
+                x: 1 / e.currentTarget.scaleX(),
+                y: 1 / e.currentTarget.scaleY(),
+              })
+            }
+          }}>
           <Layer>
             {gridLayer(blockSnapSize, 800, window.innerHeight, stagePos, scale)}
             {connectorLayer(connectors, shapes, blockSnapSize, scale)}
-            {shapeLayer(shapes, setShapes, 7.5, scale)}
+            {shapeLayer(shapes, setShapes, 15, scale)}
+          </Layer>
+          <Layer>
+            {ruler('white')}
           </Layer>
         </Stage>
       </div>
