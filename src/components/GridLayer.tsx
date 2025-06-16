@@ -26,18 +26,18 @@ const gridLayer = (
     for (let x = startX; x <= endX; x += padding) {
         grid.push({
             key: `v#${x}`,
-            points: [x + 0.5, startY, x + 0.5, endY],
+            points: [x, startY, x, endY],
             stroke: "#ddd",
-            strokeWidth: 1,
+            strokeWidth: x === 0 ? 5 : 1,
         })
     }
 
     for (let y = startY; y <= endY; y += padding) {
         grid.push({
             key: `h#${y}`,
-            points: [startX, y + 0.5, endX, y + 0.5],
+            points: [startX, y, endX, y],
             stroke: "#ddd",
-            strokeWidth: 1,
+            strokeWidth: y === 0 ? 5 : 1,
         })
     }
     return (

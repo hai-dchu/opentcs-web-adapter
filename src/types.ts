@@ -1,4 +1,9 @@
-type Base = {
+type Data = {
+  name: string,
+  isDeleted: false,
+}
+
+type Shape = {
   id: number
   fill?: string
   stroke?: string
@@ -6,7 +11,7 @@ type Base = {
   draggable?: boolean
 }
 
-type RectType = Base & {
+type RectType = Shape & Data & {
   x: number
   y: number
   type: 'rect'
@@ -14,7 +19,7 @@ type RectType = Base & {
   height: number
 }
 
-type CircleType = Base & {
+type CircleType = Shape & Data & {
   x: number
   y: number
   type: 'circle'
