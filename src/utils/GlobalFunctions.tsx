@@ -45,54 +45,9 @@ export const undoRedo = (
 
 export const select = (
   shape: GeneralShape,
-  generalShapes: GeneralShape[],
-  setSelectRect: React.Dispatch<React.SetStateAction<any>>,
-  scale: number
+  setSelectRect: React.Dispatch<React.SetStateAction<number>>,
 ) => {
-  switch (shape.type) {
-    case 'rect':
-      setSelectRect({
-        x: shape.x,
-        y: shape.y,
-        width: shape.width,
-        height: shape.height,
-        stroke: 'lightblue',
-        strokeWidth: 2,
-        dash: [3, 3]
-      })
-      return
-    case 'circle':
-      setSelectRect({
-        x: shape.x - (shape.radius + 4),
-        y: shape.y - (shape.radius + 4),
-        width: 2 * shape.radius + 8,
-        height: 2 * shape.radius + 8,
-        stroke: 'lightblue',
-        strokeWidth: 2,
-        dash: [3 / scale, 3 / scale]
-      })
-      return
-    case 'path':
-      const fromShape = generalShapes.find((t) => t.id === shape.from)
-      const toShape = generalShapes.find((t) => t.id === shape.to)
-      if (!fromShape || !toShape) return null
-      const points = generatePath(fromShape, toShape, scale)
-
-      setSelectRect({
-        x: points[0],
-        y: points[1],
-        width: points[2] - points[0],
-        height: points[3] - points[1],
-        stroke: 'lightblue',
-        strokeWidth: 2,
-        dash: [3, 3]
-      })
-      return
-    case 'zone':
-      return null
-    default:
-      return null
-  }
+  setSelectRect(shape.id)
 }
 
 export const copyPaste = (

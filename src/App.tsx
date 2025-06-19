@@ -1,6 +1,6 @@
 // For temporary use
 import { useEffect, useRef, useState } from 'react'
-import { Circle, Rect, Layer, Stage, useStrictMode } from 'react-konva'
+import { Circle, Group, Layer, Stage, useStrictMode } from 'react-konva'
 
 // user-defined functions
 import './App.css'
@@ -9,6 +9,7 @@ import type { GeneralShape, Node, Path } from './types'
 import shapeLayer from './components/GeneralShapeLayer'
 // import zoneLayer from './components/ZoneLayer'
 import { undoRedo } from './utils/GlobalFunctions'
+import selectRectLayer from './components/SelectRectLayer'
 
 useStrictMode(true) // force update canvas when there is change
 
@@ -189,7 +190,7 @@ const App = () => {
     setStagePos({ x: 0, y: 0 })
   }
 
-  const [selectRect, setSelectRect] = useState<any>(null)
+  const [selectRect, setSelectRect] = useState<number>(-1)
 
   //#region the component
   return (
@@ -237,7 +238,7 @@ const App = () => {
             // handleCreateZone(e)
             if (e.target && e.target.id() !== 'stage') return
             if (isDraggable) return
-            setSelectRect(null)
+            setSelectRect(-1)
           }}
           onWheel={(e) => {
             // setStagePos(e.currentTarget.position())
@@ -245,22 +246,12 @@ const App = () => {
           }}
         >
           <Layer>
-            {selectRect !== null ? (
-              <Rect
-                x={selectRect.x / scale}
-                y={selectRect.y / scale}
-                width={selectRect.width / scale}
-                height={selectRect.height / scale}
-                stroke={selectRect.stroke}
-                strokeWidth={selectRect.strokeWidth / scale}
-                dash={selectRect.dash}
-              />
-            ) : (null)}
-          </Layer>
-          <Layer>
-            {gridLayer(blockSnapSize, window.innerWidth * 3 / 5, window.innerHeight * 0.95, stagePos, scale)}
+            {gridLayer(blockSnapSize, window.innerWidth * 3 / 5, window.innerHeight * 0.98, stagePos, scale)}
             <Circle x={0} y={0} radius={1} stroke={'black'} />
             {/* {zoneLayer(zones, setZones, blockSnapSize, scale)} */}
+            <Group>
+              {!isDraggable ? selectRectLayer(generalShapes, selectRect, scale) : null}
+            </Group>
             {shapeLayer(
               generalShapes,
               setGeneralShapes,

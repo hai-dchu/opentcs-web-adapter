@@ -26,6 +26,6 @@
   gap: 10px;
 }
 
-.info::-webkit-scrollbar {
+::-webkit-scrollbar {
   display: none;
 }

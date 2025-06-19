@@ -10,7 +10,7 @@ const shapeLayer = (
   addPath: (node: Node) => void,
   handleShapeSelectionViewInfo: (shape: GeneralShape) => void,
   isDraggable: boolean,
-  setSelectRect: React.Dispatch<React.SetStateAction<any>>,
+  setSelectRect: React.Dispatch<React.SetStateAction<number>>,
   scale: number
 ) => {
   const handleDragEnd = (id: number, x: number, y: number) => {
@@ -41,7 +41,7 @@ const shapeLayer = (
                     Math.round(e.target.y() / blockSnapSize) * blockSnapSize
                   )}
                   onClick={() => {
-                    if (!isDraggable) select(shape, shapes, setSelectRect, scale)
+                    if (!isDraggable) select(shape, setSelectRect)
                     addPath(shape)
                     handleShapeSelectionViewInfo(shape)
                   }}
@@ -63,7 +63,7 @@ const shapeLayer = (
                     Math.round(e.target.y() / blockSnapSize) * blockSnapSize
                   )}
                   onClick={() => {
-                    if (!isDraggable) select(shape, shapes, setSelectRect, scale)
+                    if (!isDraggable) select(shape, setSelectRect)
                     addPath(shape)
                     handleShapeSelectionViewInfo(shape)
                   }}
@@ -87,7 +87,7 @@ const shapeLayer = (
                   pointerLength={5 / scale}
                   pointerWidth={5 / scale}
                   onClick={() => {
-                    if (!isDraggable) select(shape, shapes, setSelectRect, scale)
+                    if (!isDraggable) select(shape, setSelectRect)
                     handleShapeSelectionViewInfo(shape)
                   }}
                 />
