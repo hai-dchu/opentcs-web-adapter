@@ -2,8 +2,7 @@ import type { GeneralShape } from "../types";
 
 const generatePath = (
     from: GeneralShape,
-    to: GeneralShape,
-    scale: number
+    to: GeneralShape
 ) => {
     if (from.type === 'path' ||
         to.type === 'path' ||

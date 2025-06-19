@@ -2,7 +2,7 @@
 
 import type React from "react";
 import type { GeneralShape } from "../types";
-import generatePath from "./GenerateConnector";
+import generatePath from "./GeneratePath";
 
 // copy-paste, undo-redo, selection
 export const undoRedo = (

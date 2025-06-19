@@ -1,6 +1,6 @@
 import { Arrow, Circle, Group, Rect } from "react-konva";
 import type { GeneralShape, Node } from "../types";
-import generatePath from "../utils/GenerateConnector";
+import generatePath from "../utils/GeneratePath";
 import { select } from "../utils/GlobalFunctions";
 
 const shapeLayer = (
@@ -74,7 +74,7 @@ const shapeLayer = (
               const fromShape = shapes.find((t) => t.id === shape.from)
               const toShape = shapes.find((t) => t.id === shape.to)
               if (!fromShape || !toShape) return null
-              const points = generatePath(fromShape, toShape, scale)
+              const points = generatePath(fromShape, toShape)
 
               return (
                 <Arrow

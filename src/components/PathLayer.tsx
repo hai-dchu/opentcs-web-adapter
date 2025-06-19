@@ -1,7 +1,7 @@
 import { Arrow, Group } from "react-konva";
 import type { GeneralShape } from "../types";
 
-import generatePath from "../utils/GenerateConnector";
+import generatePath from "../utils/GeneratePath";
 
 const connectorLayer = (
   connectors: GeneralShape[],
