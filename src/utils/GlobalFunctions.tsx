@@ -45,9 +45,16 @@ export const undoRedo = (
 
 export const select = (
   shape: GeneralShape,
-  setSelectRect: React.Dispatch<React.SetStateAction<number>>,
+  setSelectRect: React.Dispatch<React.SetStateAction<number[]>>,
+  key: boolean
 ) => {
-  setSelectRect(shape.id)
+  if (key) {
+    setSelectRect((ids: number[]) => {
+      if (ids.find(t => t === shape.id)) return [...ids]
+      return [...ids, shape.id]
+    })
+  }
+  else setSelectRect([shape.id])
 }
 
 export const copyPaste = (

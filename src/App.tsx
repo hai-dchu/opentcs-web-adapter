@@ -169,7 +169,6 @@ const App = () => {
     if (isAddNode || isAddPath) return
     if (isShapeSelected === shape.id) setIsShapeSelected(-1)
     else {
-      // setIsPathSelected(-1)
       setIsShapeSelected(shape.id)
     }
   }
@@ -177,7 +176,6 @@ const App = () => {
   const handleShapeInfoOnClick = (id: number) => {
     setIsAddNode(false)
     setIsAddPath(false)
-    // setIsClickedOnShapeOrPath(true)
     if (isShapeSelected === id) setIsShapeSelected(-1)
     else setIsShapeSelected(id)
   }
@@ -190,7 +188,8 @@ const App = () => {
     setStagePos({ x: 0, y: 0 })
   }
 
-  const [selectRect, setSelectRect] = useState<number>(-1)
+  const [selectRect, setSelectRect] = useState<number[]>([])
+  //#endregion
 
   //#region the component
   return (
@@ -238,7 +237,7 @@ const App = () => {
             // handleCreateZone(e)
             if (e.target && e.target.id() !== 'stage') return
             if (isDraggable) return
-            setSelectRect(-1)
+            setSelectRect([])
           }}
           onWheel={(e) => {
             // setStagePos(e.currentTarget.position())
@@ -270,7 +269,7 @@ const App = () => {
 
       <div id='info'>
         <h4>Information</h4>
-        {isShapeSelected === -1 ?
+        {selectRect.length === 0 ?
           (<div>
             <p>Node</p>
             {nodes.map((node) => {
@@ -292,21 +291,25 @@ const App = () => {
             }
           </div>
           ) : (
-            <div onClick={() => handleShapeInfoOnClick(isShapeSelected)}>
-              <p>{generalShapes[isShapeSelected].id}: {generalShapes[isShapeSelected].name}</p>
-              {generalShapes[isShapeSelected].type === 'path' ? (
-                <div>
-                  <p>From: {generalShapes[isShapeSelected].from}</p>
-                  <p>To: {generalShapes[isShapeSelected].to}</p>
-                  <p>Distance: {generalShapes[isShapeSelected].distance}</p>
+            selectRect.map(id => {
+              return (
+                <div onClick={() => handleShapeInfoOnClick(id)}>
+                  <p>{generalShapes[id].id}: {generalShapes[id].name}</p>
+                  {generalShapes[id].type === 'path' ? (
+                    <div>
+                      <p>From: {generalShapes[id].from}</p>
+                      <p>To: {generalShapes[id].to}</p>
+                      <p>Distance: {generalShapes[id].distance}</p>
+                    </div>
+                  ) : (
+                    <div>
+                      {/* <p>{generalShapes[id].id}: {generalShapes[id].name}</p> */}
+                    </div>
+                  )}
+                  <p>Deleted: {generalShapes[id].isDeleted ? "True" : "False"}</p>
                 </div>
-              ) : (
-                <div>
-                  <p>{generalShapes[isShapeSelected].id}: {generalShapes[isShapeSelected].name}</p>
-                </div>
-              )}
-              <p>Deleted: {generalShapes[isShapeSelected].isDeleted ? "True" : "False"}</p>
-            </div>
+              )
+            })
           )
 
         }

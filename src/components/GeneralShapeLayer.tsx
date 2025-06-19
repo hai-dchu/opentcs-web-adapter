@@ -2,6 +2,8 @@ import { Arrow, Circle, Group, Rect } from "react-konva";
 import type { GeneralShape, Node } from "../types";
 import generatePath from "../utils/GeneratePath";
 import { select } from "../utils/GlobalFunctions";
+import type React from "react";
+import type Konva from "konva";
 
 const shapeLayer = (
   shapes: GeneralShape[],
@@ -10,7 +12,7 @@ const shapeLayer = (
   addPath: (node: Node) => void,
   handleShapeSelectionViewInfo: (shape: GeneralShape) => void,
   isDraggable: boolean,
-  setSelectRect: React.Dispatch<React.SetStateAction<number>>,
+  setSelectRect: React.Dispatch<React.SetStateAction<number[]>>,
   scale: number
 ) => {
   const handleDragEnd = (id: number, x: number, y: number) => {
@@ -40,8 +42,9 @@ const shapeLayer = (
                     Math.round(e.target.x() / blockSnapSize) * blockSnapSize,
                     Math.round(e.target.y() / blockSnapSize) * blockSnapSize
                   )}
-                  onClick={() => {
-                    if (!isDraggable) select(shape, setSelectRect)
+                  onClick={(e: Konva.KonvaEventObject<MouseEvent>) => {
+                    console.log(e)
+                    if (!isDraggable) select(shape, setSelectRect, e.evt.ctrlKey !== null)
                     addPath(shape)
                     handleShapeSelectionViewInfo(shape)
                   }}
@@ -62,8 +65,8 @@ const shapeLayer = (
                     Math.round(e.target.x() / blockSnapSize) * blockSnapSize,
                     Math.round(e.target.y() / blockSnapSize) * blockSnapSize
                   )}
-                  onClick={() => {
-                    if (!isDraggable) select(shape, setSelectRect)
+                  onClick={(e: Konva.KonvaEventObject<MouseEvent>) => {
+                    if (!isDraggable) select(shape, setSelectRect, e.evt.shiftKey)
                     addPath(shape)
                     handleShapeSelectionViewInfo(shape)
                   }}
@@ -86,8 +89,9 @@ const shapeLayer = (
                   strokeWidth={(shape.strokeWidth || 1) / scale}
                   pointerLength={5 / scale}
                   pointerWidth={5 / scale}
-                  onClick={() => {
-                    if (!isDraggable) select(shape, setSelectRect)
+                  onClick={(e: Konva.KonvaEventObject<MouseEvent>) => {
+                    console.log(e)
+                    if (!isDraggable) select(shape, setSelectRect, e.evt.ctrlKey !== null)
                     handleShapeSelectionViewInfo(shape)
                   }}
                 />
