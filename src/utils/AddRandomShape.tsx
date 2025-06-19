@@ -1,4 +1,4 @@
-import type { ShapeData } from "../types";
+import type { GeneralShape } from "../types";
 
 // helper function
 // shapes: array containing previous shapes
@@ -7,8 +7,8 @@ import type { ShapeData } from "../types";
 // width: div width
 // height: div height
 const addRandomShape = (
-    shapes: ShapeData[],
-    setShapes: React.Dispatch<React.SetStateAction<ShapeData[]>>,
+    shapes: GeneralShape[],
+    setShapes: React.Dispatch<React.SetStateAction<GeneralShape[]>>,
     blockSnapSize: number,
     width: number,
     height: number
@@ -16,7 +16,7 @@ const addRandomShape = (
     const id = shapes.length;
     const x = Math.random() * width;
     const y = Math.random() * height;
-    const newShape: ShapeData = 0.3 > 0.5
+    const newShape: GeneralShape = 0.3 > 0.5
         ? {
             id,
             type: 'rect',

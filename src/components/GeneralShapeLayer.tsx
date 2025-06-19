@@ -1,12 +1,13 @@
-import { Circle, Group, Rect } from "react-konva";
-import type { ShapeData } from "../types";
+import { Arrow, Circle, Group, Rect } from "react-konva";
+import type { GeneralShape, Node } from "../types";
+import generateConnectors from "../utils/GenerateConnector";
 
 const shapeLayer = (
-  shapes: ShapeData[],
-  setShapes: React.Dispatch<React.SetStateAction<ShapeData[]>>,
+  shapes: GeneralShape[],
+  setShapes: React.Dispatch<React.SetStateAction<GeneralShape[]>>,
   blockSnapSize: number,
-  handleAddPath: (shape: ShapeData) => void,
-  handleShapeSelectionViewInfo: (shape: ShapeData) => void,
+  addPath: (node: Node) => void,
+  handleShapeSelectionViewInfo: (shape: GeneralShape) => void,
   scale: number
 ) => {
   const handleDragEnd = (id: number, x: number, y: number) => {
@@ -37,7 +38,8 @@ const shapeLayer = (
                     Math.round(e.target.y() / blockSnapSize) * blockSnapSize
                   )}
                   onClick={() => {
-                    handleAddPath(shape)
+                    addPath(shape)
+                    handleShapeSelectionViewInfo(shape)
                   }}
                 />
               )
@@ -47,24 +49,42 @@ const shapeLayer = (
                   key={shape.id}
                   x={shape.x}
                   y={shape.y}
-                  radius={shape.radius}
+                  radius={shape.radius / scale}
                   fill={shape.fill || '#000'}
                   stroke={shape.stroke || '#ddd'}
                   strokeWidth={shape.strokeWidth || 2}
                   draggable={shape.draggable || true}
-                  // onDragMove={(e) => {
-                  //     handleDragEnd(shape.id, e.target.x(), e.target.y())
-                  // }}
                   onDragEnd={(e) => handleDragEnd(shape.id,
                     Math.round(e.target.x() / blockSnapSize) * blockSnapSize,
                     Math.round(e.target.y() / blockSnapSize) * blockSnapSize
                   )}
                   onClick={() => {
-                    handleAddPath(shape)
+                    addPath(shape)
                     handleShapeSelectionViewInfo(shape)
                   }}
                 />
               )
+
+            case 'path':
+              const fromShape = shapes.find((t) => t.id === shape.from)
+              const toShape = shapes.find((t) => t.id === shape.to)
+              if (!fromShape || !toShape) return null
+              const points = generateConnectors(fromShape, toShape, scale)
+
+              return (
+                <Arrow
+                  id={`${shape.id}`}
+                  key={shape.id}
+                  points={points}
+                  fill={shape.fill}
+                  stroke={shape.stroke}
+                  strokeWidth={(shape.strokeWidth || 1) / scale}
+                  pointerLength={5 / scale}
+                  pointerWidth={5 / scale}
+                  onClick={() => handleShapeSelectionViewInfo(shape)}
+                />
+              )
+              return null
             default:
               return null
           }

@@ -1,10 +1,14 @@
-import type { ShapeData } from "../types";
+import type { GeneralShape } from "../types";
 
 const generateConnectors = (
-    from: ShapeData,
-    to: ShapeData,
+    from: GeneralShape,
+    to: GeneralShape,
     scale: number
 ) => {
+    if (from.type === 'connector' ||
+        to.type === 'connector' ||
+        from.type === 'zone' ||
+        to.type === 'zone') return [0, 0, 0, 0]
     const dx = to.x - from.x;
     const dy = to.y - from.y;
     let angle = Math.atan2(-dy, dx);

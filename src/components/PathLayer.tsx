@@ -1,17 +1,18 @@
 import { Arrow, Group } from "react-konva";
-import type { ConnectorData, ShapeData } from "../types";
+import type { GeneralShape } from "../types";
 
 import generateConnectors from "../utils/GenerateConnector";
 
 const connectorLayer = (
-    connectors: ConnectorData[],
-    shapes: ShapeData[],
-    blockSnapSize: number,
+    connectors: GeneralShape[],
+    shapes: GeneralShape[],
+    handleConnectorSelectionViewInfo: (connector: GeneralShape) => void,
     scale: number
 ) => {
     return (
         <Group>
             {connectors.map((connector) => {
+                if (connector.type !== 'connector') return null
                 const fromShape = shapes.find((t) => t.id === connector.from)
                 const toShape = shapes.find((t) => t.id === connector.to)
                 if (!fromShape || !toShape) return null
@@ -24,7 +25,10 @@ const connectorLayer = (
                         points={points}
                         fill={connector.fill}
                         stroke={connector.stroke}
-                        strokeWidth={connector.strokeWidth} />
+                        strokeWidth={(connector.strokeWidth || 1) / scale}
+                        pointerLength={5 / scale}
+                        pointerWidth={5 / scale}
+                        onClick={() => handleConnectorSelectionViewInfo(connector)} />
                 )
             })}
         </Group>

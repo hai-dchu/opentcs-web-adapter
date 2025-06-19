@@ -1,7 +1,7 @@
-import type { ConnectorData, ShapeData } from "../types"
+import type { ConnectorData, GeneralShape } from "../types"
 
 const connectRandomShapes = (
-    shapes: ShapeData[],
+    shapes: GeneralShape[],
     setConnectors: React.Dispatch<React.SetStateAction<ConnectorData[]>>
 ) => {
     const number = 30

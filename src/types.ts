@@ -1,17 +1,18 @@
 type Data = {
+  id: number
   name: string,
   isDeleted: false,
+  // ... TODO other attributes here
 }
 
 type Shape = {
-  id: number
   fill?: string
   stroke?: string
   strokeWidth?: number
   draggable?: boolean
 }
 
-type RectType = Shape & Data & {
+type Rect = Shape & Data & {
   x: number
   y: number
   type: 'rect'
@@ -19,24 +20,32 @@ type RectType = Shape & Data & {
   height: number
 }
 
-type CircleType = Shape & Data & {
+type Circle = Shape & Data & {
   x: number
   y: number
   type: 'circle'
   radius: number
 }
 
-type ConnectorType = {
-  id: number
-  from: number
-  to: number
-  fill?: string
-  stroke?: string
-  strokeWidth?: number
-  draggable?: boolean
+export type Node = Rect | Circle
+
+export type Path = Shape & Data & {
+  type: 'path'
+  from: number // node id
+  to: number // node id
+  distance: number
+}
+
+export type Zone = Data & {
+  type: 'zone'
+  rows: number
+  cols: number
+  distanceRow: number
+  distanceCol: number
+  x: number
+  y: number
 }
 
 // add more shapes if needed here
 
-export type ShapeData = RectType | CircleType // | more shape here
-export type ConnectorData = ConnectorType
+export type GeneralShape = Node | Path | Zone // | more shape here
