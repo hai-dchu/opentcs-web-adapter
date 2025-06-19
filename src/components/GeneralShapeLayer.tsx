@@ -1,6 +1,7 @@
 import { Arrow, Circle, Group, Rect } from "react-konva";
 import type { GeneralShape, Node } from "../types";
-import generateConnectors from "../utils/GenerateConnector";
+import generatePath from "../utils/GenerateConnector";
+import { select } from "../utils/GlobalFunctions";
 
 const shapeLayer = (
   shapes: GeneralShape[],
@@ -8,6 +9,8 @@ const shapeLayer = (
   blockSnapSize: number,
   addPath: (node: Node) => void,
   handleShapeSelectionViewInfo: (shape: GeneralShape) => void,
+  isDraggable: boolean,
+  setSelectRect: React.Dispatch<React.SetStateAction<any>>,
   scale: number
 ) => {
   const handleDragEnd = (id: number, x: number, y: number) => {
@@ -32,12 +35,13 @@ const shapeLayer = (
                   fill={shape.fill || '#000'}
                   stroke={shape.stroke || '#ddd'}
                   strokeWidth={shape.strokeWidth || 2}
-                  draggable={shape.draggable || true}
+                  draggable={isDraggable}
                   onDragEnd={(e) => handleDragEnd(shape.id,
                     Math.round(e.target.x() / blockSnapSize) * blockSnapSize,
                     Math.round(e.target.y() / blockSnapSize) * blockSnapSize
                   )}
                   onClick={() => {
+                    if (!isDraggable) select(shape, shapes, setSelectRect, scale)
                     addPath(shape)
                     handleShapeSelectionViewInfo(shape)
                   }}
@@ -53,12 +57,13 @@ const shapeLayer = (
                   fill={shape.fill || '#000'}
                   stroke={shape.stroke || '#ddd'}
                   strokeWidth={shape.strokeWidth || 2}
-                  draggable={shape.draggable || true}
+                  draggable={isDraggable}
                   onDragEnd={(e) => handleDragEnd(shape.id,
                     Math.round(e.target.x() / blockSnapSize) * blockSnapSize,
                     Math.round(e.target.y() / blockSnapSize) * blockSnapSize
                   )}
                   onClick={() => {
+                    if (!isDraggable) select(shape, shapes, setSelectRect, scale)
                     addPath(shape)
                     handleShapeSelectionViewInfo(shape)
                   }}
@@ -69,7 +74,7 @@ const shapeLayer = (
               const fromShape = shapes.find((t) => t.id === shape.from)
               const toShape = shapes.find((t) => t.id === shape.to)
               if (!fromShape || !toShape) return null
-              const points = generateConnectors(fromShape, toShape, scale)
+              const points = generatePath(fromShape, toShape, scale)
 
               return (
                 <Arrow
@@ -81,7 +86,10 @@ const shapeLayer = (
                   strokeWidth={(shape.strokeWidth || 1) / scale}
                   pointerLength={5 / scale}
                   pointerWidth={5 / scale}
-                  onClick={() => handleShapeSelectionViewInfo(shape)}
+                  onClick={() => {
+                    if (!isDraggable) select(shape, shapes, setSelectRect, scale)
+                    handleShapeSelectionViewInfo(shape)
+                  }}
                 />
               )
               return null

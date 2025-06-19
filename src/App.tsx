@@ -1,6 +1,6 @@
 // For temporary use
 import { useEffect, useRef, useState } from 'react'
-import { Circle, Layer, Stage, useStrictMode } from 'react-konva'
+import { Circle, Rect, Layer, Stage, useStrictMode } from 'react-konva'
 
 // user-defined functions
 import './App.css'
@@ -48,7 +48,7 @@ const App = () => {
   //#endregion
 
   //#region handle zoom/scaling
-  const [scale, setScale] = useState(4)
+  const [scale, setScale] = useState(1)
   const blockSnapSize = 7.5 // block size
 
   const handleWheel = (e: any) => {
@@ -189,6 +189,8 @@ const App = () => {
     setStagePos({ x: 0, y: 0 })
   }
 
+  const [selectRect, setSelectRect] = useState<any>(null)
+
   //#region the component
   return (
     <div id='container'
@@ -205,7 +207,12 @@ const App = () => {
       <div id='control' ref={controlRef}>
         <h4>Aubot AGV Simulation</h4>
         <p>Hello World</p>
-        <button onClick={() => setIsDraggable(!isDraggable)}>Drag mode</button>
+        <button onClick={() => {
+          setIsDraggable(!isDraggable)
+          setIsAddNode(false)
+          setIsAddPath(false)
+        }
+        }>Drag mode</button>
         <button onClick={clearAll}>Clear Shape</button>
         <button onClick={handleAddNode}>Add Node</button>
         <button onClick={handleAddPath}>Add Path</button>
@@ -228,12 +235,28 @@ const App = () => {
           onClick={(e: any) => {
             addNode(e)
             // handleCreateZone(e)
+            if (e.target && e.target.id() !== 'stage') return
+            if (isDraggable) return
+            setSelectRect(null)
           }}
           onWheel={(e) => {
             // setStagePos(e.currentTarget.position())
             handleWheel(e)
           }}
         >
+          <Layer>
+            {selectRect !== null ? (
+              <Rect
+                x={selectRect.x / scale}
+                y={selectRect.y / scale}
+                width={selectRect.width / scale}
+                height={selectRect.height / scale}
+                stroke={selectRect.stroke}
+                strokeWidth={selectRect.strokeWidth / scale}
+                dash={selectRect.dash}
+              />
+            ) : (null)}
+          </Layer>
           <Layer>
             {gridLayer(blockSnapSize, window.innerWidth * 3 / 5, window.innerHeight * 0.95, stagePos, scale)}
             <Circle x={0} y={0} radius={1} stroke={'black'} />
@@ -244,12 +267,14 @@ const App = () => {
               7.5,
               addPath,
               handleShapeSelectionViewInfo,
+              isDraggable,
+              setSelectRect,
               scale
             )}
           </Layer>
-          <Layer>
-            {/* {ruler('white')} */}
-          </Layer>
+          {/* <Layer>
+            {ruler('white')}
+          </Layer> */}
         </Stage>
       </div>
 

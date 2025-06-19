@@ -1,12 +1,12 @@
 import type { GeneralShape } from "../types";
 
-const generateConnectors = (
+const generatePath = (
     from: GeneralShape,
     to: GeneralShape,
     scale: number
 ) => {
-    if (from.type === 'connector' ||
-        to.type === 'connector' ||
+    if (from.type === 'path' ||
+        to.type === 'path' ||
         from.type === 'zone' ||
         to.type === 'zone') return [0, 0, 0, 0]
     const dx = to.x - from.x;
@@ -41,4 +41,4 @@ const generateConnectors = (
     ]
 }
 
-export default generateConnectors
+export default generatePath
