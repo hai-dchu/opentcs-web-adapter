@@ -1,8 +1,7 @@
 // Functions that works with every object in the app
 
 import type React from "react";
-import type { GeneralShape } from "../types";
-import generatePath from "./GeneratePath";
+import type { GeneralShape, Node } from "../types";
 
 // copy-paste, undo-redo, selection
 export const undoRedo = (
@@ -59,7 +58,49 @@ export const select = (
 
 export const copyPaste = (
   generalShapes: GeneralShape[],
-  setGeneralShapes: React.Dispatch<React.SetStateAction<GeneralShape[]>>
-) => {
-  //
+  setGeneralShapes: React.Dispatch<React.SetStateAction<GeneralShape[]>>,
+  selectRect: number[],
+  cacheCopy: GeneralShape[],
+  setCacheCopy: React.Dispatch<React.SetStateAction<GeneralShape[]>>
+): any[] => {
+  const tmpNodes: Node[] = []
+  const handleKeydown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    const metaKey = event.ctrlKey || event.metaKey
+    if (metaKey && event.key.toLowerCase() === 'c') {
+      const tmpCache: GeneralShape[] = []
+      selectRect.forEach(id => {
+        const tmp = generalShapes.find(t => t.id === id)
+        if (tmp) tmpCache.push(tmp)
+      })
+      setCacheCopy(tmpCache)
+    } else if (metaKey && event.key.toLowerCase() === 'v') {
+      if (!selectRect.length) return
+      const shift = 2
+      const tmpCache = structuredClone(cacheCopy)
+      tmpCache.map((shape, index) => {
+        shape.id = generalShapes.length + index
+        switch (shape.type) {
+          case 'rect':
+            shape.x += shift
+            shape.y += shift
+            tmpNodes.push(shape)
+            return shape
+          case 'circle':
+            shape.x += shift
+            shape.y += shift
+            tmpNodes.push(shape)
+            return shape
+          case 'path':
+            return shape
+          case 'zone':
+            return shape
+          default:
+            return shape
+        }
+      })
+      setCacheCopy(tmpCache)
+      setGeneralShapes((prevShapes: GeneralShape[]) => [...prevShapes, ...tmpCache])
+    }
+  }
+  return [handleKeydown, tmpNodes]
 }

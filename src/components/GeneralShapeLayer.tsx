@@ -10,7 +10,6 @@ const shapeLayer = (
   setShapes: React.Dispatch<React.SetStateAction<GeneralShape[]>>,
   blockSnapSize: number,
   addPath: (node: Node) => void,
-  handleShapeSelectionViewInfo: (shape: GeneralShape) => void,
   isDraggable: boolean,
   setSelectRect: React.Dispatch<React.SetStateAction<number[]>>,
   scale: number
@@ -46,7 +45,6 @@ const shapeLayer = (
                     console.log(e)
                     if (!isDraggable) select(shape, setSelectRect, e.evt.ctrlKey !== null)
                     addPath(shape)
-                    handleShapeSelectionViewInfo(shape)
                   }}
                 />
               )
@@ -68,7 +66,6 @@ const shapeLayer = (
                   onClick={(e: Konva.KonvaEventObject<MouseEvent>) => {
                     if (!isDraggable) select(shape, setSelectRect, e.evt.shiftKey)
                     addPath(shape)
-                    handleShapeSelectionViewInfo(shape)
                   }}
                 />
               )
@@ -92,7 +89,6 @@ const shapeLayer = (
                   onClick={(e: Konva.KonvaEventObject<MouseEvent>) => {
                     console.log(e)
                     if (!isDraggable) select(shape, setSelectRect, e.evt.ctrlKey !== null)
-                    handleShapeSelectionViewInfo(shape)
                   }}
                 />
               )

@@ -8,7 +8,7 @@ import gridLayer from './components/GridLayer'
 import type { GeneralShape, Node, Path } from './types'
 import shapeLayer from './components/GeneralShapeLayer'
 // import zoneLayer from './components/ZoneLayer'
-import { undoRedo } from './utils/GlobalFunctions'
+import { copyPaste, undoRedo } from './utils/GlobalFunctions'
 import selectRectLayer from './components/SelectRectLayer'
 
 useStrictMode(true) // force update canvas when there is change
@@ -101,7 +101,7 @@ const App = () => {
   const handleAddNode = () => {
     setIsAddNode(!isAddNode)
     setIsAddPath(false)
-    setIsShapeSelected(-1)
+    setSelectRect([])
   }
   const addNode = (e: any) => {
     if (isAddNode) {
@@ -131,7 +131,7 @@ const App = () => {
   const handleAddPath = () => {
     setIsAddPath(!isAddPath)
     setIsAddNode(false)
-    setIsShapeSelected(-1)
+    setSelectRect([])
   }
 
   const addPath = (node: Node) => {
@@ -164,31 +164,28 @@ const App = () => {
   //#endregion
 
   //#region ONGOING handle select shape for information
-  const [isShapeSelected, setIsShapeSelected] = useState(-1)
-  const handleShapeSelectionViewInfo = (shape: GeneralShape) => {
-    if (isAddNode || isAddPath) return
-    if (isShapeSelected === shape.id) setIsShapeSelected(-1)
-    else {
-      setIsShapeSelected(shape.id)
-    }
-  }
-
   const handleShapeInfoOnClick = (id: number) => {
     setIsAddNode(false)
     setIsAddPath(false)
-    if (isShapeSelected === id) setIsShapeSelected(-1)
-    else setIsShapeSelected(id)
+    let val = selectRect.find(s => s === id);
+
+    if (val !== undefined) setSelectRect([])
+    else setSelectRect([id])
   }
 
   const clearAll = () => {
     setGeneralShapes([])
     setNodes([])
     setPaths([])
-    setIsShapeSelected(-1)
+    setSelectRect([])
     setStagePos({ x: 0, y: 0 })
   }
 
   const [selectRect, setSelectRect] = useState<number[]>([])
+  //#endregion
+
+  //#region copy paste
+  const [cacheCopy, setCacheCopy] = useState<GeneralShape[]>([])
   //#endregion
 
   //#region the component
@@ -201,6 +198,15 @@ const App = () => {
           lastHistoryIndex,
           resetFlag
         )(e)
+        const [func, tmpNode] = copyPaste(
+          generalShapes,
+          setGeneralShapes,
+          selectRect,
+          cacheCopy,
+          setCacheCopy
+        )
+        setNodes((prevNodes) => [...prevNodes, ...tmpNode])
+        func(e)
       }}
       tabIndex={0}
     >
@@ -254,7 +260,6 @@ const App = () => {
               setGeneralShapes,
               7.5,
               addPath,
-              handleShapeSelectionViewInfo,
               isDraggable,
               setSelectRect,
               scale
@@ -291,10 +296,10 @@ const App = () => {
             }
           </div>
           ) : (
-            selectRect.map(id => {
+            selectRect.map((id, index) => {
               return (
-                <div onClick={() => handleShapeInfoOnClick(id)}>
-                  <p>{generalShapes[id].id}: {generalShapes[id].name}</p>
+                <div key={`${index}`} onClick={() => handleShapeInfoOnClick(id)}>
+                  <p>{id}: {generalShapes[id].name}</p>
                   {generalShapes[id].type === 'path' ? (
                     <div>
                       <p>From: {generalShapes[id].from}</p>
