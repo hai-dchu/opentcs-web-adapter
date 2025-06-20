@@ -1,11 +1,13 @@
 // Functions that works with every object in the app
 
 import type React from "react";
-import type { GeneralShape, Node } from "../types";
+import type { GeneralShape, Node, Path } from "../types";
 
 // copy-paste, undo-redo, selection
 export const undoRedo = (
   setGeneralShapes: React.Dispatch<React.SetStateAction<GeneralShape[]>>,
+  setNodes: React.Dispatch<React.SetStateAction<Node[]>>,
+  setPaths: React.Dispatch<React.SetStateAction<Path[]>>,
   history: React.RefObject<GeneralShape[][]>,
   lastHistoryIndex: React.RefObject<number>,
   resetFlag: React.RefObject<boolean>
@@ -28,6 +30,10 @@ export const undoRedo = (
     lastHistoryIndex.current -= 1
     resetFlag.current = false
     setGeneralShapes(previous)
+    const nodes = previous.filter(shape => shape.type === 'rect' || shape.type === 'circle') as Node[]
+    const paths = previous.filter(shape => shape.type === 'path') as Path[]
+    setNodes(nodes)
+    setPaths(paths)
   }
 
   const handleRedo = () => {
@@ -37,6 +43,10 @@ export const undoRedo = (
     lastHistoryIndex.current += 1
     resetFlag.current = false
     setGeneralShapes(next)
+    const nodes = next.filter(shape => shape.type === 'rect' || shape.type === 'circle') as Node[]
+    const paths = next.filter(shape => shape.type === 'path') as Path[]
+    setNodes(nodes)
+    setPaths(paths)
   }
 
   return handleKeydown
@@ -59,11 +69,12 @@ export const select = (
 export const copyPaste = (
   generalShapes: GeneralShape[],
   setGeneralShapes: React.Dispatch<React.SetStateAction<GeneralShape[]>>,
+  setNodes: React.Dispatch<React.SetStateAction<Node[]>>,
+  setPaths: React.Dispatch<React.SetStateAction<Path[]>>,
   selectRect: number[],
   cacheCopy: GeneralShape[],
   setCacheCopy: React.Dispatch<React.SetStateAction<GeneralShape[]>>
-): any[] => {
-  const tmpNodes: Node[] = []
+) => {
   const handleKeydown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     const metaKey = event.ctrlKey || event.metaKey
     if (metaKey && event.key.toLowerCase() === 'c') {
@@ -75,10 +86,13 @@ export const copyPaste = (
       setCacheCopy(tmpCache)
     } else if (metaKey && event.key.toLowerCase() === 'v') {
       if (!selectRect.length) return
+      const tmpNodes: Node[] = []
       const shift = 2
-      const tmpCache = structuredClone(cacheCopy)
-      tmpCache.map((shape, index) => {
+      const cache = structuredClone(cacheCopy)
+      cache.map((shape, index) => {
         shape.id = generalShapes.length + index
+        console.log(`copy shape ${shape.id} from ${shape.name}`);
+        shape.name = `${shape.name} copy`
         switch (shape.type) {
           case 'rect':
             shape.x += shift
@@ -98,9 +112,11 @@ export const copyPaste = (
             return shape
         }
       })
-      setCacheCopy(tmpCache)
-      setGeneralShapes((prevShapes: GeneralShape[]) => [...prevShapes, ...tmpCache])
+
+      setCacheCopy(cache)
+      setGeneralShapes((prevShapes: GeneralShape[]) => [...prevShapes, ...cache])
+      setNodes((prevNodes) => [...prevNodes, ...tmpNodes])
     }
   }
-  return [handleKeydown, tmpNodes]
+  return handleKeydown
 }

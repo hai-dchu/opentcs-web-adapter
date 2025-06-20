@@ -42,8 +42,7 @@ const shapeLayer = (
                     Math.round(e.target.y() / blockSnapSize) * blockSnapSize
                   )}
                   onClick={(e: Konva.KonvaEventObject<MouseEvent>) => {
-                    console.log(e)
-                    if (!isDraggable) select(shape, setSelectRect, e.evt.ctrlKey !== null)
+                    select(shape, setSelectRect, e.evt.ctrlKey !== null)
                     addPath(shape)
                   }}
                 />
@@ -64,7 +63,7 @@ const shapeLayer = (
                     Math.round(e.target.y() / blockSnapSize) * blockSnapSize
                   )}
                   onClick={(e: Konva.KonvaEventObject<MouseEvent>) => {
-                    if (!isDraggable) select(shape, setSelectRect, e.evt.shiftKey)
+                    select(shape, setSelectRect, e.evt.shiftKey)
                     addPath(shape)
                   }}
                 />
@@ -88,7 +87,7 @@ const shapeLayer = (
                   pointerWidth={5 / scale}
                   onClick={(e: Konva.KonvaEventObject<MouseEvent>) => {
                     console.log(e)
-                    if (!isDraggable) select(shape, setSelectRect, e.evt.ctrlKey !== null)
+                    select(shape, setSelectRect, e.evt.ctrlKey !== null)
                   }}
                 />
               )

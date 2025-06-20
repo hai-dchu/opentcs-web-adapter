@@ -194,19 +194,21 @@ const App = () => {
       onKeyDown={(e: any) => {
         undoRedo(
           setGeneralShapes,
+          setNodes,
+          setPaths,
           history,
           lastHistoryIndex,
           resetFlag
         )(e)
-        const [func, tmpNode] = copyPaste(
+        copyPaste(
           generalShapes,
           setGeneralShapes,
+          setNodes,
+          setPaths,
           selectRect,
           cacheCopy,
           setCacheCopy
-        )
-        setNodes((prevNodes) => [...prevNodes, ...tmpNode])
-        func(e)
+        )(e)
       }}
       tabIndex={0}
     >
@@ -242,7 +244,7 @@ const App = () => {
             addNode(e)
             // handleCreateZone(e)
             if (e.target && e.target.id() !== 'stage') return
-            if (isDraggable) return
+            // if (isDraggable) return
             setSelectRect([])
           }}
           onWheel={(e) => {
@@ -254,7 +256,7 @@ const App = () => {
             {gridLayer(blockSnapSize, window.innerWidth * 3 / 5, window.innerHeight * 0.98, stagePos, scale)}
             <Circle x={0} y={0} radius={1} stroke={'black'} />
             {/* {zoneLayer(zones, setZones, blockSnapSize, scale)} */}
-            {!isDraggable ? selectRectLayer(generalShapes, selectRect, scale) : null}
+            {selectRectLayer(generalShapes, selectRect, scale)}
             {shapeLayer(
               generalShapes,
               setGeneralShapes,
